@@ -1,0 +1,7 @@
+﻿  main.c
+C:\Users\goodr\source\repos\keylogger\keylogger\main.c(1,1): warning C4005: 'UNICODE': 매크로 재정의
+C:\Users\goodr\source\repos\keylogger\keylogger\main.c(1,1): message : 이전에 명령줄에서 선언된 'UNICODE'
+C:\Users\goodr\source\repos\keylogger\keylogger\main.c(129,21): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\goodr\source\repos\keylogger\keylogger\main.c(240,17): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\goodr\source\repos\keylogger\keylogger\main.c(287,33): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  keylogger.vcxproj -> C:\Users\goodr\source\repos\keylogger\x64\Debug\keylogger.exe
